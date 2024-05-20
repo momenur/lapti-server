@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
-const { MongoClient } = require("mongodb");
+const { MongoClient, ObjectId } = require("mongodb");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 
@@ -88,6 +88,14 @@ async function run() {
     app.get("/api/v1/laptops", async (req, res) => {
       const cursor = laptopsCollection.find();
       const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    app.get("/api/v1/laptops/:id", async (req, res) => {
+      const id = req.params.id;
+      const result = await laptopsCollection.findOne({
+        _id: new ObjectId(id),
+      });
       res.send(result);
     });
 
