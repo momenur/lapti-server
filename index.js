@@ -99,6 +99,35 @@ async function run() {
       res.send(result);
     });
 
+    // ==============================================================
+    // Query Backend Is Start
+
+    app.get("/api/v1/brand", async (req, res) => {
+      const { brand, minPrice, maxPrice, rating } = req.query;
+      let query = {};
+
+      if (brand && brand !== "all-laptops") {
+        query.brandName = { $regex: brand, $options: "i" };
+      }
+
+      if (minPrice || maxPrice) {
+        query.regularPrice = {};
+        if (minPrice) query.regularPrice.$gte = parseFloat(minPrice);
+        if (maxPrice) query.regularPrice.$lte = parseFloat(maxPrice);
+      }
+
+      if (rating) {
+        query.ratings = { $gte: parseFloat(rating) };
+      }
+
+      const brands = await laptopsCollection.find(query).toArray();
+
+      res.send(brands);
+    });
+
+    // ==============================================================
+    // Query Backend Is End
+
     app.post("/api/v1/laptop", async (req, res) => {
       const newLaptop = req.body;
       const result = await laptopsCollection.insertOne(newLaptop);
